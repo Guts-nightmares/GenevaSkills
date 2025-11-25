@@ -1,92 +1,86 @@
-/**
- * RegisterForm - Formulaire d'inscription
- *
- * Permet à un nouvel utilisateur de créer un compte avec
- * un nom d'utilisateur, un email et un mot de passe
- */
+// RegisterForm - Le formulaire pour créer un compte
+// Ici tu choisis ton nom d'utilisateur, ton email et ton mot de passe
 
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useToast } from '@/components/ui/use-toast'
+// J'importe ce dont j'ai besoin
+import { useState } from 'react'  // Pour gérer mes états
+import { useNavigate, Link } from 'react-router-dom'  // Pour changer de page
+import { Button } from '@/components/ui/button'  // Bouton stylé
+import { Input } from '@/components/ui/input'  // Champ de texte stylé
+import { Label } from '@/components/ui/label'  // Label stylé
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'  // Carte stylée
+import { useToast } from '@/components/ui/use-toast'  // Pour les messages
 
-/**
- * Composant RegisterForm
- */
+// Ma fonction principale du formulaire d'inscription
 export default function RegisterForm() {
-  // Navigation entre les pages
+  // navigate = pour aller sur d'autres pages
   const navigate = useNavigate()
 
-  // Messages de notification
+  // toast = pour afficher des messages
   const { toast } = useToast()
 
-  // États du formulaire
-  const [loading, setLoading] = useState(false)  // Chargement en cours
-  const [username, setUsername] = useState('')  // Nom d'utilisateur saisi
-  const [email, setEmail] = useState('')  // Email saisi
-  const [password, setPassword] = useState('')  // Mot de passe saisi
-  const [confirmPassword, setConfirmPassword] = useState('')  // Confirmation du mot de passe
+  // Mes états (variables qui peuvent changer)
+  const [loading, setLoading] = useState(false)  // true = en train d'envoyer
+  const [username, setUsername] = useState('')  // Mon nom d'utilisateur
+  const [email, setEmail] = useState('')  // Mon email
+  const [password, setPassword] = useState('')  // Mon mot de passe
+  const [confirmPassword, setConfirmPassword] = useState('')  // Je retape mon mot de passe pour vérifier
 
-  // URL de l'API - auto-détection
+  // URL de mon API - change automatiquement
   const API_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:8000'  // En local
-    : window.location.origin + '/api'  // En production
+    : window.location.origin + '/api'  // Sur le serveur
 
-  /**
-   * Soumission du formulaire d'inscription
-   * @param {Event} e - Événement du formulaire
-   */
+  // Fonction qui se lance quand je clique sur "Créer mon compte"
   async function handleSubmit(e) {
-    // Empêche le rechargement de la page
+    // J'empêche la page de se recharger
     e.preventDefault()
 
-    // Vérifie que les mots de passe correspondent
+    // Je vérifie que les deux mots de passe sont pareils
     if (password !== confirmPassword) {
       toast({ title: 'Erreur', description: 'Les mots de passe sont différents', variant: 'destructive' })
-      return
+      return  // Je m'arrête là
     }
 
-    // Vérifie la longueur minimale du mot de passe
+    // Je vérifie que le mot de passe fait au moins 6 caractères
     if (password.length < 6) {
       toast({ title: 'Erreur', description: 'Mot de passe trop court', variant: 'destructive' })
-      return
+      return  // Je m'arrête là
     }
 
-    // Active l'état de chargement
+    // Je dis que je suis en train de charger
     setLoading(true)
 
-    // Appelle l'API d'inscription
+    // J'envoie mes infos au serveur pour créer mon compte
     const response = await fetch(`${API_URL}/auth.php?action=register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password })
+      method: 'POST',  // J'envoie des données
+      headers: { 'Content-Type': 'application/json' },  // Je dis que c'est du JSON
+      body: JSON.stringify({ username, email, password })  // Mes infos en JSON
     })
 
-    // Récupère la réponse
+    // Je récupère la réponse du serveur
     const data = await response.json()
 
     if (response.ok) {
-      // Inscription réussie
-      localStorage.setItem('token', data.token)  // Sauvegarde le token
-      localStorage.setItem('user', JSON.stringify(data.user))  // Sauvegarde l'utilisateur
+      // Cas 1 : Inscription réussie
+      localStorage.setItem('token', data.token)  // Je sauvegarde mon token
+      localStorage.setItem('user', JSON.stringify(data.user))  // Je sauvegarde mes infos
       toast({ title: 'Compte créé' })  // Message de succès
-      navigate('/')  // Redirige vers le dashboard
+      navigate('/')  // Je vais sur le dashboard
     } else {
-      // Inscription échouée
+      // Cas 2 : Inscription échouée (nom d'utilisateur déjà pris)
       toast({ title: 'Erreur', description: 'Ce nom existe déjà', variant: 'destructive' })
     }
 
-    // Désactive l'état de chargement
+    // Je dis que j'ai fini de charger
     setLoading(false)
   }
 
+  // J'affiche mon formulaire d'inscription
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      {/* La carte avec mon formulaire */}
       <Card className="w-full max-w-md">
-        {/* En-tête */}
+        {/* En-tête de la carte */}
         <CardHeader>
           <CardTitle className="text-2xl">Inscription</CardTitle>
           <CardDescription>
@@ -94,59 +88,60 @@ export default function RegisterForm() {
           </CardDescription>
         </CardHeader>
 
-        {/* Contenu */}
+        {/* Le contenu de la carte */}
         <CardContent>
+          {/* Mon formulaire - quand je soumets, ça appelle handleSubmit */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Champ nom d'utilisateur */}
+            {/* Champ pour le nom d'utilisateur */}
             <div>
               <Label>Nom d'utilisateur</Label>
               <Input
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
+                value={username}  // Ce que j'ai tapé
+                onChange={(e) => setUsername(e.target.value)}  // Quand je tape
+                required  // Obligatoire
               />
             </div>
 
-            {/* Champ email */}
+            {/* Champ pour l'email */}
             <div>
               <Label>Email</Label>
               <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                type="email"  // Vérifie automatiquement que c'est un email valide
+                value={email}  // Ce que j'ai tapé
+                onChange={(e) => setEmail(e.target.value)}  // Quand je tape
+                required  // Obligatoire
               />
             </div>
 
-            {/* Champ mot de passe */}
+            {/* Champ pour le mot de passe */}
             <div>
               <Label>Mot de passe</Label>
               <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                type="password"  // Masque les caractères
+                value={password}  // Ce que j'ai tapé
+                onChange={(e) => setPassword(e.target.value)}  // Quand je tape
+                required  // Obligatoire
               />
             </div>
 
-            {/* Champ confirmation du mot de passe */}
+            {/* Champ pour confirmer le mot de passe */}
             <div>
               <Label>Confirmer le mot de passe</Label>
               <Input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
+                type="password"  // Masque les caractères
+                value={confirmPassword}  // Ce que j'ai tapé
+                onChange={(e) => setConfirmPassword(e.target.value)}  // Quand je tape
+                required  // Obligatoire
               />
             </div>
 
-            {/* Bouton de soumission */}
+            {/* Le bouton pour créer mon compte */}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Chargement...' : "Créer mon compte"}
+              {loading ? 'Chargement...' : "Créer mon compte"}  {/* Change le texte pendant le chargement */}
             </Button>
 
-            {/* Lien vers la connexion */}
+            {/* Lien pour aller se connecter si j'ai déjà un compte */}
             <div className="text-center text-sm">
               <Link to="/login" className="text-primary hover:underline">
                 J'ai déjà un compte

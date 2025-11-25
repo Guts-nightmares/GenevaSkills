@@ -56,13 +56,14 @@ function getCategories() {
     $db = getDB();
 
     // Prépare la requête pour récupérer les catégories avec le compte des tâches
+    // COLLATE utf8mb4_general_ci = tri alphabétique sans tenir compte des majuscules/minuscules
     $stmt = $db->prepare("
         SELECT c.*, COUNT(t.id) as task_count
         FROM categories c
         LEFT JOIN tasks t ON c.id = t.category_id
         WHERE c.user_id = ?
         GROUP BY c.id
-        ORDER BY c.name
+        ORDER BY c.name COLLATE utf8mb4_general_ci ASC
     ");
 
     // Exécute avec l'ID de l'utilisateur

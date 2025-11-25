@@ -20,7 +20,7 @@ files.forEach(file => {
     const src = path.join(apiSource, file)
     const dest = path.join(apiDest, file)
     fs.copyFileSync(src, dest)
-    console.log(`✓ Copié: api/${file}`)
+    console.log(`Copié: api/${file}`)
   }
 })
 

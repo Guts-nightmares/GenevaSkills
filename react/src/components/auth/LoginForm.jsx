@@ -1,67 +1,59 @@
-/**
- * LoginForm - Formulaire de connexion
- *
- * Permet à un utilisateur de se connecter avec son nom d'utilisateur
- * et son mot de passe
- */
+// LoginForm - Le formulaire pour se connecter
+// C'est ici que tu tapes ton nom d'utilisateur et ton mot de passe
 
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useToast } from '@/components/ui/use-toast'
+// J'importe ce dont j'ai besoin
+import { useState } from 'react'  // Pour gérer mes états
+import { useNavigate, Link } from 'react-router-dom'  // Pour changer de page
+import { Button } from '@/components/ui/button'  // Bouton stylé
+import { Input } from '@/components/ui/input'  // Champ de texte stylé
+import { Label } from '@/components/ui/label'  // Label stylé
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'  // Carte stylée
+import { useToast } from '@/components/ui/use-toast'  // Pour les messages
 
-/**
- * Composant LoginForm
- */
+// Ma fonction principale du formulaire de connexion
 export default function LoginForm() {
-  // Navigation entre les pages
+  // navigate = pour aller sur d'autres pages
   const navigate = useNavigate()
 
-  // Messages de notification
+  // toast = pour afficher des messages
   const { toast } = useToast()
 
-  // États du formulaire
-  const [loading, setLoading] = useState(false)  // Chargement en cours
-  const [username, setUsername] = useState('')  // Nom d'utilisateur saisi
-  const [password, setPassword] = useState('')  // Mot de passe saisi
+  // Mes états (variables qui peuvent changer)
+  const [loading, setLoading] = useState(false)  // true = en train d'envoyer
+  const [username, setUsername] = useState('')  // Ce que je tape comme nom d'utilisateur
+  const [password, setPassword] = useState('')  // Ce que je tape comme mot de passe
 
-  // URL de l'API - auto-détection
+  // URL de mon API - change automatiquement
   const API_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:8000'
-    : window.location.origin + '/api'
+    ? 'http://localhost:8000'  // En local
+    : window.location.origin + '/api'  // Sur le serveur
 
-  /**
-   * Soumission du formulaire de connexion
-   * @param {Event} e - Événement du formulaire
-   */
+  // Fonction qui se lance quand je clique sur "Se connecter"
   async function handleSubmit(e) {
-    // Empêche le rechargement de la page
+    // J'empêche la page de se recharger
     e.preventDefault()
 
-    // Active l'état de chargement
+    // Je dis que je suis en train de charger
     setLoading(true)
 
-    // Appelle l'API de connexion
+    // J'envoie mes identifiants au serveur
     const response = await fetch(`${API_URL}/auth.php?action=login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      method: 'POST',  // J'envoie des données
+      headers: { 'Content-Type': 'application/json' },  // Je dis que c'est du JSON
+      body: JSON.stringify({ username, password })  // Mes identifiants en JSON
     })
 
-    // Récupère la réponse
+    // Je récupère la réponse du serveur
     const data = await response.json()
 
     if (response.ok) {
-      // Connexion réussie
-      localStorage.setItem('token', data.token)  // Sauvegarde le token
-      localStorage.setItem('user', JSON.stringify(data.user))  // Sauvegarde l'utilisateur
+      // Cas 1 : Connexion réussie
+      localStorage.setItem('token', data.token)  // Je sauvegarde mon token dans le navigateur
+      localStorage.setItem('user', JSON.stringify(data.user))  // Je sauvegarde mes infos
       toast({ title: 'Connecté' })  // Message de succès
-      navigate('/')  // Redirige vers le dashboard
+      navigate('/')  // Je vais sur le dashboard
     } else {
-      // Connexion échouée
+      // Cas 2 : Connexion échouée (mauvais mot de passe ou utilisateur inexistant)
       toast({
         title: 'Erreur',
         description: 'Mauvais identifiants',
@@ -69,50 +61,53 @@ export default function LoginForm() {
       })
     }
 
-    // Désactive l'état de chargement
+    // Je dis que j'ai fini de charger
     setLoading(false)
   }
 
+  // J'affiche mon formulaire de connexion
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      {/* La carte avec mon formulaire */}
       <Card className="w-full max-w-md">
-        {/* En-tête */}
+        {/* En-tête de la carte */}
         <CardHeader>
           <CardTitle>Connexion</CardTitle>
           <CardDescription>Entrez vos identifiants</CardDescription>
         </CardHeader>
 
-        {/* Contenu */}
+        {/* Le contenu de la carte */}
         <CardContent>
+          {/* Mon formulaire - quand je soumets, ça appelle handleSubmit */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Champ nom d'utilisateur */}
+            {/* Champ pour le nom d'utilisateur */}
             <div>
               <Label>Nom d'utilisateur</Label>
               <Input
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
+                value={username}  // Ce que j'ai tapé
+                onChange={(e) => setUsername(e.target.value)}  // Quand je tape, ça met à jour
+                required  // Obligatoire
               />
             </div>
 
-            {/* Champ mot de passe */}
+            {/* Champ pour le mot de passe */}
             <div>
               <Label>Mot de passe</Label>
               <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                type="password"  // Masque les caractères
+                value={password}  // Ce que j'ai tapé
+                onChange={(e) => setPassword(e.target.value)}  // Quand je tape
+                required  // Obligatoire
               />
             </div>
 
-            {/* Bouton de soumission */}
+            {/* Le bouton pour se connecter */}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Connexion...' : 'Connexion'}
+              {loading ? 'Connexion...' : 'Connexion'}  {/* Change le texte pendant le chargement */}
             </Button>
 
-            {/* Lien vers l'inscription */}
+            {/* Lien pour aller créer un compte */}
             <div className="text-center text-sm">
               <Link to="/register" className="text-primary hover:underline">
                 Créer un compte

@@ -1,138 +1,127 @@
-/**
- * Categories - Page de gestion des catégories
- *
- * Permet de créer, modifier et supprimer des catégories
- * pour organiser les tâches
- */
+// Categories - Page pour gérer mes catégories
+// Les catégories c'est pour ranger mes tâches par thème (perso, école, sport, etc.)
 
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Layout from '@/components/layout/Layout'
-import CategoryList from '@/components/categories/CategoryList'
-import CategoryModal from '@/components/categories/CategoryModal'
-import { Button } from '@/components/ui/button'
-import { useToast } from '@/components/ui/use-toast'
+// J'importe ce dont j'ai besoin
+import { useState, useEffect } from 'react'  // Pour les états et effets
+import { useNavigate } from 'react-router-dom'  // Pour naviguer entre les pages
+import Layout from '@/components/layout/Layout'  // Mon layout avec la nav
+import CategoryList from '@/components/categories/CategoryList'  // Pour afficher mes catégories
+import CategoryModal from '@/components/categories/CategoryModal'  // Le popup pour créer/modifier
+import { Button } from '@/components/ui/button'  // Bouton stylé
+import { useToast } from '@/components/ui/use-toast'  // Messages de notification
 
-// URL de l'API - détecte automatiquement l'environnement
+// URL de mon API - détecte si je suis en local ou sur le serveur
 const API_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:8000'  // En local
-  : window.location.origin + '/api'  // En production
+  ? 'http://localhost:8000'  // En développement local
+  : window.location.origin + '/api'  // En production sur mon serveur
 
-/**
- * Appelle l'API avec authentification
- * @param {string} endpoint - Fichier PHP à appeler
- * @param {string} method - Méthode HTTP
- * @param {object} data - Données à envoyer
- * @returns {Promise} Réponse de l'API
- */
+// Ma fonction pour appeler l'API PHP
+// endpoint = le fichier à appeler (ex: 'categories.php')
+// method = GET, POST, PUT ou DELETE
+// data = les données à envoyer si j'en ai
 async function callApi(endpoint, method = 'GET', data = null) {
-  // Récupère le token
+  // Je récupère mon token de connexion
   const token = localStorage.getItem('token')
 
-  // Configure la requête
+  // Je prépare ma requête
   const options = {
-    method,
+    method,  // La méthode HTTP
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Content-Type': 'application/json',  // Je dis que c'est du JSON
+      'Authorization': `Bearer ${token}`  // Mon token pour prouver que c'est moi
     }
   }
 
-  // Ajoute les données
+  // Si j'ai des données à envoyer, je les ajoute
   if (data) options.body = JSON.stringify(data)
 
-  // Fait l'appel
+  // J'envoie ma requête
   const response = await fetch(`${API_URL}/${endpoint}`, options)
 
-  // Déconnecte si non autorisé
+  // Si le serveur dit que je suis pas connecté (401)
   if (response.status === 401) {
-    localStorage.clear()
-    window.location.href = '/#/login'
+    localStorage.clear()  // Je supprime tout
+    window.location.href = '/#/login'  // Je retourne au login
     return
   }
 
+  // Je retourne la réponse en JSON
   return response.json()
 }
 
-/**
- * Composant Categories
- */
+// Mon composant principal de la page Catégories
 export default function Categories() {
-  // Navigation entre les pages
+  // navigate = pour aller sur d'autres pages (comme le bouton retour)
   const navigate = useNavigate()
 
-  // Messages toast
+  // toast = pour afficher des messages de succès/erreur
   const { toast } = useToast()
 
-  // États
-  const [categories, setCategories] = useState([])  // Liste des catégories
-  const [loading, setLoading] = useState(true)  // Chargement en cours
-  const [showModal, setShowModal] = useState(false)  // Modal ouvert/fermé
-  const [editCategory, setEditCategory] = useState(null)  // Catégorie en édition
+  // Mes états (variables qui changent)
+  const [categories, setCategories] = useState([])  // Ma liste de catégories
+  const [loading, setLoading] = useState(true)  // true = en train de charger
+  const [showModal, setShowModal] = useState(false)  // true = popup ouvert
+  const [editCategory, setEditCategory] = useState(null)  // La catégorie que je modifie (null si création)
 
-  // Charge les catégories au démarrage
+  // useEffect = se lance au démarrage de la page
   useEffect(() => {
-    loadCategories()
-  }, [])
+    loadCategories()  // Je charge mes catégories
+  }, [])  // [] = juste une fois au début
 
-  /**
-   * Charge toutes les catégories
-   */
+  // Fonction pour charger toutes mes catégories depuis le serveur
   async function loadCategories() {
-    const data = await callApi('categories.php')
-    setCategories(data || [])
-    setLoading(false)
+    const data = await callApi('categories.php')  // J'appelle mon API
+    console.log('🏷️ Catégories reçues de l\'API:', data)  // Je regarde ce que j'ai reçu
+    console.log('📋 Ordre des catégories:', data?.map(c => c.name))  // Je regarde l'ordre
+    console.log('🔢 Nombre de tâches par catégorie:', data?.map(c => `${c.name}: ${c.task_count}`))  // Je regarde les compteurs
+    setCategories(data || [])  // Je mets à jour ma liste
+    setLoading(false)  // Je dis que c'est chargé
   }
 
-  /**
-   * Ouvre le modal pour créer ou modifier
-   * @param {object} category - Catégorie à modifier (null = créer)
-   */
+  // Fonction pour ouvrir le popup (création ou modification)
+  // Si category = null, je crée une nouvelle catégorie
+  // Sinon je modifie celle qu'on m'a donnée
   function openModal(category = null) {
-    setEditCategory(category)
-    setShowModal(true)
+    setEditCategory(category)  // Je stocke la catégorie à modifier
+    setShowModal(true)  // J'ouvre le popup
   }
 
-  /**
-   * Sauvegarde une catégorie
-   * @param {object} categoryData - Données de la catégorie
-   */
+  // Fonction pour sauvegarder une catégorie
   async function saveCategory(categoryData) {
     if (editCategory) {
-      // Modification
+      // Cas 1 : Je modifie une catégorie existante
       await callApi('categories.php', 'PUT', { ...categoryData, id: editCategory.id })
-      toast({ title: 'Catégorie modifiée' })
+      toast({ title: 'Catégorie modifiée' })  // Message de succès
     } else {
-      // Création
+      // Cas 2 : Je crée une nouvelle catégorie
       await callApi('categories.php', 'POST', categoryData)
-      toast({ title: 'Catégorie créée' })
+      toast({ title: 'Catégorie créée' })  // Message de succès
     }
-    loadCategories()  // Recharge
-    setShowModal(false)  // Ferme le modal
+    loadCategories()  // Je recharge la liste
+    setShowModal(false)  // Je ferme le popup
   }
 
-  /**
-   * Supprime une catégorie
-   * @param {object} category - Catégorie à supprimer
-   */
+  // Fonction pour supprimer une catégorie
   async function deleteCategory(category) {
+    // Je demande confirmation
     if (!confirm(`Supprimer "${category.name}" ?`)) return
-    await callApi(`categories.php?id=${category.id}`, 'DELETE')
-    toast({ title: 'Catégorie supprimée' })
-    loadCategories()
+
+    await callApi(`categories.php?id=${category.id}`, 'DELETE')  // J'appelle l'API
+    toast({ title: 'Catégorie supprimée' })  // Message
+    loadCategories()  // Je recharge
   }
 
-  // Message de chargement
+  // Si je suis en train de charger, j'affiche "Chargement..."
   if (loading) return <Layout><p>Chargement...</p></Layout>
 
-  // Affiche la page
+  // J'affiche ma page
   return (
     <Layout>
       <div className="space-y-6">
-        {/* En-tête */}
+        {/* En-tête avec le bouton retour et le titre */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {/* Bouton retour */}
+            {/* Bouton pour retourner au dashboard */}
             <Button variant="outline" onClick={() => navigate('/')}>
               Retour
             </Button>
@@ -141,23 +130,23 @@ export default function Categories() {
               <p className="text-gray-600">Organiser mes tâches</p>
             </div>
           </div>
-          {/* Bouton ajouter */}
+          {/* Bouton pour créer une nouvelle catégorie */}
           <Button onClick={() => openModal()}>Ajouter une catégorie</Button>
         </div>
 
-        {/* Liste des catégories */}
+        {/* Ma liste de catégories (grille avec les cartes) */}
         <CategoryList
-          categories={categories}
-          onEdit={openModal}
-          onDelete={deleteCategory}
+          categories={categories}  // Mes catégories
+          onEdit={openModal}  // Quand je clique sur modifier
+          onDelete={deleteCategory}  // Quand je clique sur supprimer
         />
 
-        {/* Modal de création/édition */}
+        {/* Le popup pour créer ou modifier une catégorie */}
         <CategoryModal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          onSave={saveCategory}
-          category={editCategory}
+          isOpen={showModal}  // true = ouvert
+          onClose={() => setShowModal(false)}  // Fermer le popup
+          onSave={saveCategory}  // Sauvegarder
+          category={editCategory}  // La catégorie à modifier (null si création)
         />
       </div>
     </Layout>
