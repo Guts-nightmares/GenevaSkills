@@ -1,0 +1,29 @@
+# Dépendances
+node_modules/
+react/node_modules/
+
+# Build
+react/dist/
+
+# Configuration sensible
+api/config.php
+
+# Logs
+*.log
+error_log.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporaire
+*.tmp
+*.bak
+.cache/
