@@ -102,63 +102,68 @@ function login() {
  * Crée un nouveau compte utilisateur
  */
 function register() {
-    // Récupère les données JSON envoyées
-    $data = getJsonInput();
+    try {
+        // Récupère les données JSON envoyées
+        $data = getJsonInput();
 
-    // Nettoie les données reçues (sécurité)
-    $username = cleanString($data['username'] ?? '');
-    $email = cleanString($data['email'] ?? '');
-    $password = $data['password'] ?? '';
+        // Nettoie les données reçues (sécurité)
+        $username = cleanString($data['username'] ?? '');
+        $email = cleanString($data['email'] ?? '');
+        $password = $data['password'] ?? '';
 
-    // Vérifie que tous les champs sont remplis
-    if (!$username || !$email || !$password) {
-        respondError('Tous les champs requis', 400);
-    }
+        // Vérifie que tous les champs sont remplis
+        if (!$username || !$email || !$password) {
+            respondError('Tous les champs requis', 400);
+        }
 
-    // Vérifie la longueur minimale du mot de passe
-    if (strlen($password) < 6) {
-        respondError('Password min 6 caracteres', 400);
-    }
+        // Vérifie la longueur minimale du mot de passe
+        if (strlen($password) < 6) {
+            respondError('Password min 6 caracteres', 400);
+        }
 
-    // Se connecte à la base de données
-    $db = getDB();
+        // Se connecte à la base de données
+        $db = getDB();
 
-    // Vérifie si le nom d'utilisateur ou l'email existe déjà
-    $stmt = $db->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
-    $stmt->execute([$username, $email]);
+        // Vérifie si le nom d'utilisateur ou l'email existe déjà
+        $stmt = $db->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
+        $stmt->execute([$username, $email]);
 
-    // Si un utilisateur existe déjà, renvoie une erreur
-    if ($stmt->fetch()) {
-        respondError('Username ou email deja pris', 409);
-    }
+        // Si un utilisateur existe déjà, renvoie une erreur
+        if ($stmt->fetch()) {
+            respondError('Username ou email deja pris', 409);
+        }
 
-    // Hache le mot de passe pour la sécurité
-    $hash = password_hash($password, PASSWORD_DEFAULT);
+        // Hache le mot de passe pour la sécurité
+        $hash = password_hash($password, PASSWORD_DEFAULT);
 
-    // Prépare la requête d'insertion (role_id 2 = utilisateur normal)
-    $stmt = $db->prepare("INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, 2)");
+        // Prépare la requête d'insertion (role_id 2 = utilisateur normal)
+        $stmt = $db->prepare("INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, 2)");
 
-    // Exécute l'insertion
-    if ($stmt->execute([$username, $email, $hash])) {
-        // Récupère l'ID du nouvel utilisateur
-        $userId = $db->lastInsertId();
+        // Exécute l'insertion
+        if ($stmt->execute([$username, $email, $hash])) {
+            // Récupère l'ID du nouvel utilisateur
+            $userId = $db->lastInsertId();
 
-        // Génère un token JWT pour connecter automatiquement
-        $token = generateJWT($userId, $username);
+            // Génère un token JWT pour connecter automatiquement
+            $token = generateJWT($userId, $username);
 
-        // Renvoie le token et les infos utilisateur
-        respondSuccess([
-            'token' => $token,
-            'user' => [
-                'id' => $userId,
-                'username' => $username,
-                'email' => $email,
-                'role' => 'user'
-            ]
-        ], 201);
-    } else {
-        // En cas d'erreur d'insertion
-        respondError('Erreur inscription', 500);
+            // Renvoie le token et les infos utilisateur
+            respondSuccess([
+                'token' => $token,
+                'user' => [
+                    'id' => $userId,
+                    'username' => $username,
+                    'email' => $email,
+                    'role' => 'user'
+                ]
+            ], 201);
+        } else {
+            // En cas d'erreur d'insertion
+            respondError('Erreur inscription', 500);
+        }
+    } catch(Exception $e) {
+        // En cas d'erreur, renvoie le message d'erreur
+        respondError('Erreur serveur: ' . $e->getMessage(), 500);
     }
 }
 

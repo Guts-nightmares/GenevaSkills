@@ -42,35 +42,54 @@ export default function RegisterForm() {
     // Je vérifie que les deux mots de passe sont pareils
     if (password !== confirmPassword) {
       toast({ title: 'Erreur', description: 'Les mots de passe sont différents', variant: 'destructive' })
-      return 
+      return
     }
 
     // Je vérifie que le mot de passe fait au moins 6 caractères
     if (password.length < 6) {
       toast({ title: 'Erreur', description: 'Mot de passe trop court', variant: 'destructive' })
-      return  
+      return
     }
 
     // Je dis que je suis en train de charger
     setLoading(true)
 
-    // J'envoie mes infos au serveur pour créer mon compte
-    const response = await fetch(`${API_URL}/auth.php?action=register`, {
-      method: 'POST',  // J'envoie des données
-      headers: { 'Content-Type': 'application/json' },  // Je dis que c'est du JSON
-      body: JSON.stringify({ username, email, password })  
-    })
+    try {
+      // J'envoie mes infos au serveur pour créer mon compte
+      const response = await fetch(`${API_URL}/auth.php?action=register`, {
+        method: 'POST',  // J'envoie des données
+        headers: { 'Content-Type': 'application/json' },  // Je dis que c'est du JSON
+        body: JSON.stringify({ username, email, password })
+      })
 
-    // Je récupère la réponse du serveur
-    const data = await response.json()
+      // Je recupere le texte brut d'abord
+      const text = await response.text()
 
-    if (response.ok) {
-      localStorage.setItem('token', data.token)  // Je sauvegarde mon token
-      localStorage.setItem('user', JSON.stringify(data.user))  // Je sauvegarde mes infos
-      toast({ title: 'Compte créé',  duration: 4000 })  // Message de succès
-      navigate('/')  // Je vais sur le dashboard
-    } else {
-      toast({ title: 'Erreur', description: 'Ce nom existe déjà', variant: 'destructive' })
+      // Je vérifie si c'est vraiment du JSON
+      let data
+      try {
+        data = JSON.parse(text)
+      } catch (err) {
+        // Si c'est pas du JSON ca veut dire qu'il y a une erreur PHP
+        console.error('Erreur serveur:', text)
+        toast({ title: 'Erreur serveur', description: 'Verifie la console', variant: 'destructive' })
+        setLoading(false)
+        return
+      }
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token)  // Je sauvegarde mon token
+        localStorage.setItem('user', JSON.stringify(data.user))  // Je sauvegarde mes infos
+        toast({ title: 'Compte créé',  duration: 4000 })  // Message de succès
+        navigate('/')  // Je vais sur le dashboard
+      } else {
+        // J'affiche le vrai message d'erreur du serveur
+        toast({ title: 'Erreur', description: data.error || 'Ce nom existe déjà', variant: 'destructive' })
+      }
+    } catch (error) {
+      // Si il y a une erreur de connexion
+      console.error('Erreur:', error)
+      toast({ title: 'Erreur', description: 'Impossible de se connecter au serveur', variant: 'destructive' })
     }
 
     // Je dis que j'ai fini de charger
