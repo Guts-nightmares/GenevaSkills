@@ -52,15 +52,19 @@ function getTasks() {
     // Vérifie les permissions et récupère l'utilisateur
     $user = can('view_tasks');
 
-
-    // Récupère les paramètres de filtre optionnels
+    // Récupère les paramètres de filtre optionnels depuis l'URL
     $status = $_GET['status'] ?? null;
-    $categoryId = $_GET['category_id'] ?? null;
+    $categoryId = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
+
+    // Sécurité : ne garder que des valeurs valides pour le statut
+    if ($status && !in_array($status, ['todo', 'done'])) {
+        $status = null;
+    }
 
     // Se connecte à la base de données
     $db = getDB();
 
-    // Construit la requête SQL de base
+    // Construire la requête SQL de base
     $sql = "
         SELECT t.*, c.name as category_name, c.color as category_color
         FROM tasks t
@@ -71,13 +75,12 @@ function getTasks() {
     // Prépare le tableau des paramètres
     $params = [$user['userId']];
 
-    // Ajoute le filtre par statut si présent
+    // Ajoute les filtres si présents
     if ($status) {
         $sql .= " AND t.status = ?";
         $params[] = $status;
     }
 
-    // Ajoute le filtre par catégorie si présent
     if ($categoryId) {
         $sql .= " AND t.category_id = ?";
         $params[] = $categoryId;
@@ -93,6 +96,7 @@ function getTasks() {
     // Renvoie toutes les tâches trouvées
     success($stmt->fetchAll());
 }
+
 
 /**
  * Crée une nouvelle tâche pour l'utilisateur connecté

@@ -75,10 +75,15 @@ export default function Dashboard() {
 
   // Fonction pour charger toutes mes tâches depuis le serveur
   async function loadTasks() {
-    const data = await callApi('tasks.php')  // J'appelle mon API
-    setTasks(data || [])  // Je mets à jour ma liste (ou [] si vide)
-    setLoading(false)  // Je dis que c'est chargé
+    const query = new URLSearchParams()
+    if (filters.status) query.append('status', filters.status)
+    if (filters.category_id) query.append('category_id', filters.category_id)
+
+    const data = await callApi(`tasks.php?${query.toString()}`)
+    setTasks(data || [])
+    setLoading(false)
   }
+
 
   // Fonction pour charger toutes mes catégories
   async function loadCategories() {
