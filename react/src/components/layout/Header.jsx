@@ -39,7 +39,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-blue-600 shadow-md">
+    <header className="sticky top-0 z-50 bg-gray-800 shadow-md">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-white cursor-pointer" onClick={() => navigate('/')}>

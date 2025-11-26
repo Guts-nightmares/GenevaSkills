@@ -102,9 +102,7 @@ export default function LoginForm() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t"></div>
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-gray-50 text-gray-500">Pas encore de compte?</span>
-                </div>
+                
               </div>
               <Link to="/register">
                 <Button type="button" variant="outline" className="w-full">

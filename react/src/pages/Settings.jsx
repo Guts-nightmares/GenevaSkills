@@ -146,10 +146,6 @@ export default function Settings() {
       return
     }
 
-    if (!confirm('Vraiment sûr ? Toutes tes tâches et catégories seront supprimées.')) {
-      return
-    }
-
     setLoadingDelete(true)
 
     try {
@@ -258,7 +254,7 @@ export default function Settings() {
         {/* Carte pour supprimer le compte */}
         <Card>
           <CardHeader className="bg-red-100">
-            <CardTitle className="text-red-700">Zone de danger</CardTitle>
+            <CardTitle className="text-red-700">Supprimer son compte</CardTitle>
 
           </CardHeader>
           <CardContent className="bg-red-50 pt-6">

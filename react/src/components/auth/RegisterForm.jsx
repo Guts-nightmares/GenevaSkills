@@ -134,9 +134,7 @@ export default function RegisterForm() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t"></div>
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-gray-50 text-gray-500">Déjà un compte?</span>
-                </div>
+                
               </div>
               <Link to="/login">
                 <Button type="button" variant="outline" className="w-full">
