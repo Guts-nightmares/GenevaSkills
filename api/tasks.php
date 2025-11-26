@@ -52,6 +52,7 @@ function getTasks() {
     // Vérifie les permissions et récupère l'utilisateur
     $user = can('view_tasks');
 
+
     // Récupère les paramètres de filtre optionnels
     $status = $_GET['status'] ?? null;
     $categoryId = $_GET['category_id'] ?? null;

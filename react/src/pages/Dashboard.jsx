@@ -83,8 +83,6 @@ export default function Dashboard() {
   // Fonction pour charger toutes mes catégories
   async function loadCategories() {
     const data = await callApi('categories.php')  // J'appelle mon API
-    console.log('📦 Catégories reçues de l\'API:', data)  // Je regarde ce que j'ai reçu
-    console.log('📝 Ordre des catégories:', data?.map(c => c.name))  // Je regarde l'ordre
     setCategories(data || [])  // Je mets à jour ma liste
   }
 

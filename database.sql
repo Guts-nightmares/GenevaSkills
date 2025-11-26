@@ -68,6 +68,14 @@ CREATE TABLE IF NOT EXISTS tasks (
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+
+
+
+
+
+
+
 -- Roles par defaut
 INSERT INTO roles (name, description) VALUES
 ('admin', 'Administrateur'),

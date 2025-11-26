@@ -27,18 +27,22 @@ export default function Header() {
   }
 
   return (
-    <header className="border-b bg-white">
+    // Header sticky = reste en haut quand je scroll
+    <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
+          {/* Logo / Titre cliquable */}
           <h1
-            className="text-xl font-bold cursor-pointer"
+            className="text-xl font-bold cursor-pointer hover:text-blue-600 transition-colors"
             onClick={() => navigate('/')}
           >
             Todo List
           </h1>
 
+          {/* Menu si connecté */}
           {user && (
             <div className="flex items-center gap-4">
+              {/* Bouton Catégories (sauf si on est déjà sur cette page) */}
               {location.pathname !== '/categories' && (
                 <Button
                   variant="outline"
@@ -47,7 +51,9 @@ export default function Header() {
                   Catégories
                 </Button>
               )}
+              {/* Nom de l'utilisateur */}
               <span className="text-sm">{user.username}</span>
+              {/* Bouton déconnexion */}
               <Button
                 variant="outline"
                 onClick={handleLogout}

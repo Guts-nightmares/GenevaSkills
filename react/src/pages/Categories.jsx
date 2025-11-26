@@ -71,9 +71,6 @@ export default function Categories() {
   // Fonction pour charger toutes mes catégories depuis le serveur
   async function loadCategories() {
     const data = await callApi('categories.php')  // J'appelle mon API
-    console.log('🏷️ Catégories reçues de l\'API:', data)  // Je regarde ce que j'ai reçu
-    console.log('📋 Ordre des catégories:', data?.map(c => c.name))  // Je regarde l'ordre
-    console.log('🔢 Nombre de tâches par catégorie:', data?.map(c => `${c.name}: ${c.task_count}`))  // Je regarde les compteurs
     setCategories(data || [])  // Je mets à jour ma liste
     setLoading(false)  // Je dis que c'est chargé
   }

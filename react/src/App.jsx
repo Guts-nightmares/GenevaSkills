@@ -6,6 +6,7 @@ import RegisterForm from '@/components/auth/RegisterForm'
 import Dashboard from '@/pages/Dashboard'
 import Categories from '@/pages/Categories'
 import { Toaster } from '@/components/ui/toaster'
+import Footer from './components/layout/Footer'
 
 // Bloque l'accès aux pages si pas connecté
 function ProtectedRoute({ children }) {
@@ -62,11 +63,10 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
         {/* Route par défaut */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <Toaster />
+      <Toaster  />
     </Router>
   )
 }

@@ -16,7 +16,8 @@ export default function CategoryList({ categories, onEdit, onDelete }) {
 
   return (
     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-      {categories.map((category) => (
+      {/* Map me permet de display mon tableau sur plusieur div, c'est modifiable si je rajoute un tache*/}
+      {categories.map((category) => ( 
         <Card key={category.id} className="hover:shadow-md transition-shadow">
           <CardContent className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-3">

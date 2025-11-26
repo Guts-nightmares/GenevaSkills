@@ -18,7 +18,8 @@ class Database {
     // Le constructeur est privé pour empêcher de créer plusieurs connexions
     private function __construct() {
         try {
-            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8;port=3306";
+            // utf8mb4 = support complet des caractères Unicode et tri correct
+            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4;port=3306";
 
             $options = [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -27,6 +28,9 @@ class Database {
             ];
 
             $this->connection = new PDO($dsn, DB_USER, DB_PASS, $options);
+
+            // Force le charset utf8mb4 pour être sûr
+            $this->connection->exec("SET NAMES utf8mb4 COLLATE utf8mb4_general_ci");
 
         } catch (PDOException $e) {
             if (DEBUG_MODE) {
