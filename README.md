@@ -37,7 +37,7 @@ npm run dev
 
 - nom utilisateur demo : Demo
 - mot de passe utilisateur Demo : Demo1234
-Le frontend tourne sur `localhost:5173` (Vite)
+- Le frontend tourne sur `localhost:5173` (Vite)
 Le backend tourne sur `localhost:8000` (PHP)
 
 ## Build
