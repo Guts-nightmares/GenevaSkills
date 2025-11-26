@@ -54,13 +54,18 @@ function getTasks() {
 
     // Récupère les paramètres de filtre optionnels depuis l'URL
     $status = $_GET['status'] ?? null;
-    $categoryId = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
+    $categoryId = $_GET['category_id'] ?? null;
+    $sort_by = $_GET['sort_by'] ?? 'created_at'; // Par défaut on trie par date de création
+    $order = strtoupper($_GET['order'] ?? 'DESC'); // Par défaut DESC
 
-    // Sécurité : ne garder que des valeurs valides pour le statut
-    if ($status && !in_array($status, ['todo', 'done'])) {
-        $status = null;
+    $allowedSortBy = ['created_at', 'title', 'deadline', 'status'];
+    if (!in_array($sort_by, $allowedSortBy)) {
+        $sort_by = 'created_at';
     }
-
+    $allowedOrder = ['ASC', 'DESC'];
+    if (!in_array($order, $allowedOrder)) {
+        $order = 'DESC';
+    }
     // Se connecte à la base de données
     $db = getDB();
 
@@ -87,7 +92,7 @@ function getTasks() {
     }
 
     // Trie par date de création décroissante
-    $sql .= " ORDER BY t.created_at DESC";
+    $sql .= " ORDER BY " . $sort_by . " " . $order;
 
     // Prépare et exécute la requête
     $stmt = $db->prepare($sql);
