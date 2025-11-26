@@ -1,25 +1,32 @@
-import { clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
-export function formatDateShort(dateString) {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleDateString('fr-FR')
+export function formatDateShort(dateStr) {
+  if (!dateStr) return ""
+  const date = new Date(dateStr)
+  return date.toLocaleDateString("fr-CH", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })
 }
 
-export function isPastDeadline(deadline) {
-  if (!deadline) return false
-  return new Date(deadline) < new Date()
+export function isPastDeadline(dateStr) {
+  if (!dateStr) return false
+  const now = new Date()
+  const date = new Date(dateStr)
+  return date < now
 }
 
-export function isUpcoming(deadline) {
-  if (!deadline) return false
-  const deadlineDate = new Date(deadline)
-  const today = new Date()
-  const diffDays = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24))
-  return diffDays <= 3 && diffDays >= 0
+export function isUpcoming(dateStr) {
+  if (!dateStr) return false
+  const now = new Date()
+  const date = new Date(dateStr)
+  const diff = date - now
+  const twoDays = 2 * 24 * 60 * 60 * 1000
+  return diff > 0 && diff <= twoDays
 }

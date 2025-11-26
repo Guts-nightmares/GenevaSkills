@@ -80,7 +80,9 @@ export default function Dashboard() {
   async function loadTasks() {
     const query = new URLSearchParams()
     if (filters.status) query.append('status', filters.status);
-    if (filters.category_id != null) query.append('category_id', filters.category_id);
+    if (filters.category_id !== null) {
+      query.append('category_id', filters.category_id)
+    } 
     if (filters.sort_by) query.append('sort_by', filters.sort_by);
     if (filters.sort_order) query.append('order', filters.sort_order);
 
@@ -148,14 +150,16 @@ export default function Dashboard() {
     <Layout>
       <div className="space-y-6">
         {/* En-tête : le titre et le bouton pour ajouter */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between bg-gray-100 p-6">
           <div>
-            <h2 className="text-2xl font-bold">Mes tâches</h2>
-            {/* Je compte combien j'ai de tâches et j'ajoute un 's' si y'en a plusieurs */}
-            <p className="text-gray-600">{tasks.length} tâche{tasks.length > 1 ? 's' : ''}</p>
+            <h2 className="text-3xl font-bold">Mes tâches</h2>
+            <p className="text-gray-600 mt-1">
+              {tasks.length} tâche{tasks.length > 1 ? 's' : ''}
+            </p>
           </div>
-          {/* Bouton pour créer une nouvelle tâche */}
-          <Button onClick={() => openModal()}>Ajouter une tâche</Button>
+          <Button onClick={() => openModal()}>
+            Ajouter une tâche
+          </Button>
         </div>
 
         {/* Mes filtres (par statut et par catégorie) */}

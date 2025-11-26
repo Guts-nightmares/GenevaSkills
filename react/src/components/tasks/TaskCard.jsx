@@ -1,5 +1,4 @@
-// Carte pour afficher une tâche avec tous ses détails
-
+// Composant pour afficher une tâche avec tous ses détails
 import { Check, Edit, Trash2, Calendar, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
@@ -11,9 +10,14 @@ export default function TaskCard({ task, onEdit, onDelete, onToggleStatus }) {
 
   return (
     <Card className={`task-card ${task.status === 'done' ? 'opacity-70' : ''}`}>
+      
+      {/* Contenu principal de la carte */}
       <CardContent className="pt-6">
-        {/* En-tête avec catégorie et actions */}
+        
+        {/* En-tête: catégorie et actions (modifier/supprimer) */}
         <div className="flex items-start justify-between mb-3">
+          
+          {/* Info catégorie et titre */}
           <div className="flex-1">
             {task.category_name && (
               <div className="flex items-center space-x-1 mb-2">
@@ -26,31 +30,25 @@ export default function TaskCard({ task, onEdit, onDelete, onToggleStatus }) {
                 </span>
               </div>
             )}
+
+            {/* Titre de la tâche */}
             <h3 className={`text-lg font-semibold ${task.status === 'done' ? 'line-through text-muted-foreground' : ''}`}>
               {task.title}
             </h3>
           </div>
+
+          {/* Actions: modifier / supprimer */}
           <div className="flex space-x-1 ml-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit(task)}
-              title="Modifier"
-            >
+            <Button variant="ghost" size="icon" onClick={() => onEdit(task)} title="Modifier">
               <Edit className="h-4 w-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(task)}
-              title="Supprimer"
-            >
+            <Button variant="ghost" size="icon" onClick={() => onDelete(task)} title="Supprimer">
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
           </div>
         </div>
 
-        {/* Description */}
+        {/* Description de la tâche */}
         {task.description && (
           <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
             {task.description}
@@ -64,11 +62,10 @@ export default function TaskCard({ task, onEdit, onDelete, onToggleStatus }) {
             isComingSoon ? 'text-orange-600 font-medium' :
             'text-muted-foreground'
           }`}>
-            {isOverdue ? (
-              <AlertCircle className="h-4 w-4" />
-            ) : (
-              <Calendar className="h-4 w-4" />
-            )}
+            {/* Icone selon l'état */}
+            {isOverdue ? <AlertCircle className="h-4 w-4" /> : <Calendar className="h-4 w-4" />}
+            
+            {/* Texte de la deadline */}
             <span>
               {isOverdue && 'En retard: '}
               {isComingSoon && 'Bientôt: '}
@@ -78,7 +75,9 @@ export default function TaskCard({ task, onEdit, onDelete, onToggleStatus }) {
         )}
       </CardContent>
 
+      {/* Pied de carte: statut et bouton de changement */}
       <CardFooter className="flex justify-between items-center pt-0">
+        
         {/* Badge de statut */}
         <div className={`status-badge ${
           task.status === 'done'
@@ -88,15 +87,13 @@ export default function TaskCard({ task, onEdit, onDelete, onToggleStatus }) {
           {task.status === 'done' ? 'Terminee' : 'A faire'}
         </div>
 
-        {/* Bouton de changement de statut */}
+        {/* Bouton pour basculer le statut */}
         <Button
           variant={task.status === 'done' ? 'outline' : 'default'}
           size="sm"
           onClick={() => onToggleStatus(task)}
         >
-          {task.status === 'done' ? (
-            'Rouvrir'
-          ) : (
+          {task.status === 'done' ? 'Rouvrir' : (
             <>
               <Check className="mr-2 h-4 w-4" />
               Terminer

@@ -52,54 +52,70 @@ function getTasks() {
     // Vérifie les permissions et récupère l'utilisateur
     $user = can('view_tasks');
 
-    // Récupère les paramètres de filtre optionnels depuis l'URL
+    // Paramètresy
     $status = $_GET['status'] ?? null;
-    $categoryId = $_GET['category_id'] ?? null;
-    $sort_by = $_GET['sort_by'] ?? 'created_at'; // Par défaut on trie par date de création
-    $order = strtoupper($_GET['order'] ?? 'DESC'); // Par défaut DESC
+    $sort_by = $_GET['sort_by'] ?? 'created_at';
+    $order = strtoupper($_GET['order'] ?? 'DESC');
 
+    // Récupération du paramètre category_id
+    $categoryParam = $_GET['category_id'] ?? null;
+
+    $filterNoCategory = false;
+    $categoryId = null;
+
+    if ($categoryParam !== null && $categoryParam !== "" && $categoryParam == "0") {
+        $filterNoCategory = true;
+    }
+    elseif ($categoryParam !== null && ctype_digit($categoryParam) && (int)$categoryParam > 0) {
+        $categoryId = (int)$categoryParam;
+    }
+
+    // Validation du tri
     $allowedSortBy = ['created_at', 'title', 'deadline', 'status'];
-    if (!in_array($sort_by, $allowedSortBy)) {
-        $sort_by = 'created_at';
-    }
+    if (!in_array($sort_by, $allowedSortBy)) $sort_by = 'created_at';
+
     $allowedOrder = ['ASC', 'DESC'];
-    if (!in_array($order, $allowedOrder)) {
-        $order = 'DESC';
-    }
-    // Se connecte à la base de données
+    if (!in_array($order, $allowedOrder)) $order = 'DESC';
+
+    // Base
     $db = getDB();
 
-    // Construire la requête SQL de base
     $sql = "
         SELECT t.*, c.name as category_name, c.color as category_color
         FROM tasks t
         LEFT JOIN categories c ON t.category_id = c.id
-        WHERE t.user_id = ?
+        WHERE t.user_id = :user_id
     ";
 
-    // Prépare le tableau des paramètres
-    $params = [$user['userId']];
+    $params = [':user_id' => $user['userId']];
 
-    // Ajoute les filtres si présents
+    // Filtre statut
     if ($status) {
-        $sql .= " AND t.status = ?";
-        $params[] = $status;
+        $sql .= " AND t.status = :status";
+        $params[':status'] = $status;
     }
 
-    if ($categoryId) {
-        $sql .= " AND t.category_id = ?";
-        $params[] = $categoryId;
+    // Filtre catégorie
+    if ($filterNoCategory) {
+        // category_id = 0 → tâches sans catégorie
+        $sql .= " AND t.category_id IS NULL";
+    } 
+    elseif ($categoryId !== null) {
+        // category_id > 0 → filtre normal
+        $sql .= " AND t.category_id = :category";
+        $params[':category'] = $categoryId;
     }
 
-    // Trie par date de création décroissante
-    $sql .= " ORDER BY " . $sort_by . " " . $order;
+    // Tri
+    $sql .= " ORDER BY $sort_by $order";
 
-    // Prépare et exécute la requête
+    // Prépare et exécute
     $stmt = $db->prepare($sql);
     $stmt->execute($params);
 
-    // Renvoie toutes les tâches trouvées
+    // Retourne
     success($stmt->fetchAll());
+
 }
 
 

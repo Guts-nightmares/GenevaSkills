@@ -116,19 +116,19 @@ export default function Categories() {
     <Layout>
       <div className="space-y-6">
         {/* En-tête avec le bouton retour et le titre */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between bg-gray-100 p-6">
           <div className="flex items-center gap-4">
-            {/* Bouton pour retourner au dashboard */}
             <Button variant="outline" onClick={() => navigate('/')}>
               Retour
             </Button>
             <div>
-              <h2 className="text-2xl font-bold">Catégories</h2>
-              <p className="text-gray-600">Organiser mes tâches</p>
+              <h2 className="text-3xl font-bold">Catégories</h2>
+              <p className="text-gray-600 mt-1">Organiser mes tâches</p>
             </div>
           </div>
-          {/* Bouton pour créer une nouvelle catégorie */}
-          <Button onClick={() => openModal()}>Ajouter une catégorie</Button>
+          <Button onClick={() => openModal()}>
+            Ajouter une catégorie
+          </Button>
         </div>
 
         {/* Ma liste de catégories (grille avec les cartes) */}

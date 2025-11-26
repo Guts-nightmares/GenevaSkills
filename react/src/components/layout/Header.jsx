@@ -1,64 +1,67 @@
-// En-tête simple
+// Header - La barre en haut de mon site
+// Elle reste collée en haut quand je scroll (sticky)
 
-import { Button } from '@/components/ui/button'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-
+import { Button } from '@/components/ui/button'  // Mes boutons stylés
+import { useNavigate, useLocation } from 'react-router-dom'  // Pour changer de page
+import { useEffect, useState } from 'react'  // Pour gérer mes états
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+// Mon composant Header
 export default function Header() {
+  // navigate = pour aller sur d'autres pages
   const navigate = useNavigate()
-  const location = useLocation()
-  const [user, setUser] = useState(null)
+  const getInitials = (user) => {
+    if (!user) return "";
+    return user.username.substring(0, 2).toUpperCase();
+  };
 
+  // location = pour savoir sur quelle page je suis
+  const location = useLocation()
+
+  // user = l'utilisateur connecté (null si pas connecté)
+  const [user, setUser] = useState(null)
+  // useEffect = se lance au démarrage pour récupérer l'utilisateur
   useEffect(() => {
-    const userStr = localStorage.getItem('user')
-    if (userStr) {
+    const userStr = localStorage.getItem('user')  // Je lis le localStorage
+    if (userStr) {  // Si y'a quelque chose
       try {
-        setUser(JSON.parse(userStr))
+        setUser(JSON.parse(userStr))  // Je transforme le texte en objet
       } catch (e) {
-        setUser(null)
+        setUser(null)  // Si erreur, pas d'utilisateur
       }
     }
-  }, [])
+  }, [])  // [] = juste une fois au début
 
+  // Fonction pour se déconnecter
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    navigate('/login')
+    localStorage.removeItem('token')  // Je supprime le token
+    localStorage.removeItem('user')  // Je supprime l'utilisateur
+    navigate('/login')  // Je retourne au login
   }
 
   return (
-    // Header sticky = reste en haut quand je scroll
-    <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
+    <header className="sticky top-0 z-50 bg-blue-600 shadow-md">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo / Titre cliquable */}
-          <h1
-            className="text-xl font-bold cursor-pointer hover:text-blue-600 transition-colors"
-            onClick={() => navigate('/')}
-          >
-            Todo List
+          <h1 className="text-2xl font-bold text-white cursor-pointer" onClick={() => navigate('/')}>
+            Task Manager
           </h1>
-
-          {/* Menu si connecté */}
           {user && (
-            <div className="flex items-center gap-4">
-              {/* Bouton Catégories (sauf si on est déjà sur cette page) */}
+            <div className="flex items-center gap-3">
               {location.pathname !== '/categories' && (
-                <Button
-                  variant="outline"
-                  onClick={() => navigate('/categories')}
-                >
+                <Button variant="secondary" onClick={() => navigate('/categories')}>
                   Catégories
                 </Button>
               )}
-              {/* Nom de l'utilisateur */}
-              <span className="text-sm">{user.username}</span>
-              {/* Bouton déconnexion */}
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-              >
-                Se déconnecter
+              {location.pathname !== '/settings' && (
+                <Button variant="secondary" onClick={() => navigate('/settings')}>
+                  Paramètres
+                </Button>
+              )}
+              <Avatar>
+              <AvatarFallback>{getInitials(user)}</AvatarFallback>
+            </Avatar>
+              <Button onClick={handleLogout} className="bg-red-600 hover:bg-red-700 text-white">
+                Déconnexion
               </Button>
             </div>
           )}

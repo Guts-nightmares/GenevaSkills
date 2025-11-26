@@ -5,6 +5,7 @@ import LoginForm from '@/components/auth/LoginForm'
 import RegisterForm from '@/components/auth/RegisterForm'
 import Dashboard from '@/pages/Dashboard'
 import Categories from '@/pages/Categories'
+import Settings from '@/pages/Settings'
 import { Toaster } from '@/components/ui/toaster'
 import Footer from './components/layout/Footer'
 
@@ -60,6 +61,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Categories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           }
         />

@@ -67,59 +67,54 @@ export default function LoginForm() {
 
   // J'affiche mon formulaire de connexion
   return (
-    // Conteneur avec footer en bas
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Contenu principal (formulaire centré) */}
+    <div className="min-h-screen bg-white flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4">
-        {/* La carte avec mon formulaire */}
         <Card className="w-full max-w-md">
-          {/* En-tête de la carte */}
-          <CardHeader>
+          <CardHeader className="bg-gray-50">
             <CardTitle>Connexion</CardTitle>
-            <CardDescription>Entrez vos identifiants</CardDescription>
           </CardHeader>
-
-          <CardContent>
+          <CardContent className="pt-6 bg-gray-50">
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label>Nom d'utilisateur</Label>
                 <Input
                   type="text"
-                  value={username}  // Ce que j'ai tapé
+                  placeholder="Entre ton nom d'utilisateur"
+                  value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
-
-
-              <div>
+              <div className="space-y-2">
                 <Label>Mot de passe</Label>
                 <Input
-                  type="password"  // Masque les caractères
+                  type="password"
+                  placeholder="Entre ton mot de passe"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
-
-
-              <Button type="submit" ctype="submit"
-                className={`w-full transition-all ${isDisabled || loading ? "bg-gray-400 cursor-not-allowed opacity-60" : "bg-blue-600 hover:bg-blue-700" }`}   disabled={isDisabled || loading}>
-                {loading ? 'Connexion...' : 'Connexion'}  {/* Change le texte pendant le chargement */}
+              <Button type="submit" disabled={isDisabled || loading} className="w-full">
+                {loading ? "Connexion..." : "Se connecter"}
               </Button>
-
-              {/* Lien pour aller créer un compte */}
-              <div className="text-center text-sm">
-                <Link to="/register" className="text-primary hover:underline">
-                  Créer un compte
-                </Link>
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-gray-50 text-gray-500">Pas encore de compte?</span>
+                </div>
               </div>
+              <Link to="/register">
+                <Button type="button" variant="outline" className="w-full">
+                  Créer un compte
+                </Button>
+              </Link>
             </form>
           </CardContent>
         </Card>
       </div>
-
-      {/* Mon footer en bas */}
       <Footer />
     </div>
   )

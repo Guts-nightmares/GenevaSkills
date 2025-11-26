@@ -79,88 +79,74 @@ export default function RegisterForm() {
 
   // J'affiche mon formulaire d'inscription
   return (
-    // Conteneur avec footer en bas
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Contenu principal (formulaire centré) */}
+    <div className="min-h-screen bg-white flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4">
-        {/* La carte avec mon formulaire */}
         <Card className="w-full max-w-md">
-          {/* En-tête de la carte */}
-          <CardHeader>
-            <CardTitle className="text-2xl">Inscription</CardTitle>
-            <CardDescription>
-              Créez votre compte
-            </CardDescription>
+          <CardHeader className="bg-gray-50">
+            <CardTitle>Inscription</CardTitle>
           </CardHeader>
-
-          {/* Le contenu de la carte */}
-          <CardContent>
-            {/* Mon formulaire - quand je soumets, ça appelle handleSubmit */}
+          <CardContent className="pt-6 bg-gray-50">
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Champ pour le nom d'utilisateur */}
-              <div>
+              <div className="space-y-2">
                 <Label>Nom d'utilisateur</Label>
                 <Input
                   type="text"
-                  value={username}  // Ce que j'ai tapé
-                  onChange={(e) => setUsername(e.target.value)}  // Quand je tape
-                  required  // Obligatoire
+                  placeholder="Choisis un nom d'utilisateur"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
                 />
               </div>
-
-              {/* Champ pour l'email */}
-              <div>
+              <div className="space-y-2">
                 <Label>Email</Label>
                 <Input
-                  type="email"  // Vérifie automatiquement que c'est un email valide
-                  value={email}  // Ce que j'ai tapé
-                  onChange={(e) => setEmail(e.target.value)}  // Quand je tape
-                  required  // Obligatoire
+                  type="email"
+                  placeholder="ton@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
               </div>
-
-              {/* Champ pour le mot de passe */}
-              <div>
+              <div className="space-y-2">
                 <Label>Mot de passe</Label>
                 <Input
-                  type="password"  // Masque les caractères
-                  value={password}  // Ce que j'ai tapé
-                  onChange={(e) => setPassword(e.target.value)}  // Quand je tape
-                  required  // Obligatoire
+                  type="password"
+                  placeholder="Min. 6 caractères"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
               </div>
-
-              {/* Champ pour confirmer le mot de passe */}
-              <div>
-                <Label>Confirmer le mot de passe</Label>
+              <div className="space-y-2">
+                <Label>Confirme ton mot de passe</Label>
                 <Input
-                  type="password"  // Masque les caractères
-                  value={confirmPassword}  // Ce que j'ai tapé
-                  onChange={(e) => setConfirmPassword(e.target.value)}  // Quand je tape
-                  required  // Obligatoire
+                  type="password"
+                  placeholder="Retape ton mot de passe"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
                 />
               </div>
-
-              {/* Le bouton pour créer mon compte */}
-              <Button type="submit" disabled={loading || isDisabled}
-                className={`w-full transition-all ${
-                  loading || isDisabled ? 'bg-gray-400 cursor-not-allowed opacity-60' : 'bg-blue-600 hover:bg-blue-700'
-                }`}
-              >
-                {loading ? 'Chargement...' : "Créer mon compte"}  {/* Change le texte pendant le chargement */}
+              <Button type="submit" disabled={loading || isDisabled} className="w-full">
+                {loading ? "Création..." : "Créer mon compte"}
               </Button>
-
-              {/* Lien pour aller se connecter si j'ai déjà un compte */}
-              <div className="text-center text-sm">
-                <Link to="/login" className="text-primary hover:underline">
-                  J'ai déjà un compte
-                </Link>
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-gray-50 text-gray-500">Déjà un compte?</span>
+                </div>
               </div>
+              <Link to="/login">
+                <Button type="button" variant="outline" className="w-full">
+                  Se connecter
+                </Button>
+              </Link>
             </form>
           </CardContent>
         </Card>
       </div>
-
       <Footer />
     </div>
   )
