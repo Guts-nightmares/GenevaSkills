@@ -49,37 +49,40 @@ switch ($method) {
  * Supporte les filtres par statut et par catégorie
  */
 function getTasks() {
-    // Vérifie les permissions et récupère l'utilisateur
+    // Je verifie que l'utilisateur a le droit
     $user = can('view_tasks');
 
-    // Paramètresy
+    // Je recupere les parametres de l'URL
     $status = $_GET['status'] ?? null;
     $sort_by = $_GET['sort_by'] ?? 'created_at';
     $order = strtoupper($_GET['order'] ?? 'DESC');
 
-    // Récupération du paramètre category_id
+    // Je recupere le parametre de categorie
     $categoryParam = $_GET['category_id'] ?? null;
 
     $filterNoCategory = false;
     $categoryId = null;
 
+    // Si c'est "0" ca veut dire sans categorie
     if ($categoryParam !== null && $categoryParam !== "" && $categoryParam == "0") {
         $filterNoCategory = true;
     }
+    // Sinon si c'est un nombre > 0 c'est l'ID de la categorie
     elseif ($categoryParam !== null && ctype_digit($categoryParam) && (int)$categoryParam > 0) {
         $categoryId = (int)$categoryParam;
     }
 
-    // Validation du tri
+    // Je valide le tri (pour eviter les injections SQL)
     $allowedSortBy = ['created_at', 'title', 'deadline', 'status'];
     if (!in_array($sort_by, $allowedSortBy)) $sort_by = 'created_at';
 
     $allowedOrder = ['ASC', 'DESC'];
     if (!in_array($order, $allowedOrder)) $order = 'DESC';
 
-    // Base
+    // Je me connecte a la base
     $db = getDB();
 
+    // Ma requete SQL de base
     $sql = "
         SELECT t.*, c.name as category_name, c.color as category_color
         FROM tasks t
@@ -89,24 +92,24 @@ function getTasks() {
 
     $params = [':user_id' => $user['userId']];
 
-    // Filtre statut
+    // Si on filtre par statut
     if ($status) {
         $sql .= " AND t.status = :status";
         $params[':status'] = $status;
     }
 
-    // Filtre catégorie
+    // Si on filtre par categorie
     if ($filterNoCategory) {
-        // category_id = 0 → tâches sans catégorie
+        // Taches sans categorie
         $sql .= " AND t.category_id IS NULL";
-    } 
+    }
     elseif ($categoryId !== null) {
-        // category_id > 0 → filtre normal
+        // Taches d'une categorie specifique
         $sql .= " AND t.category_id = :category";
         $params[':category'] = $categoryId;
     }
 
-    // Tri
+    // Je rajoute le tri
     $sql .= " ORDER BY $sort_by $order";
 
     // Prépare et exécute
