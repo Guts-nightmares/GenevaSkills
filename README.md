@@ -1,4 +1,4 @@
-# Task Manager Bertrand Noel
+# Task Manager de Guts-nightmares
 
 liens vers le github : https://github.com/Guts-nightmares/GenevaSkills
 
