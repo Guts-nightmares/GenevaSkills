@@ -48,7 +48,3 @@ npm run build
 ```
 
 Ce qui est sur le serveur est le dist que j'ai généré
-
----
-
-Projet Geneva Skills par Noel Bertrand - 2025
